@@ -23,12 +23,12 @@ final class MainView: BaseView {
         $0.font = .systemFont(ofSize: 14)
     }
     
-    private let tamagochiImageView = UIImageView().then {
+    let tamagochiImageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.image = ._1_1
     }
     
-    private let nameLabel = TamagochiNameView()
+    let nameView = TamagochiNameView()
     
     private let infoLabel = UILabel().then {
         $0.text = "TEST"
@@ -47,7 +47,7 @@ extension MainView {
         [
             bubbleimageView,
             tamagochiImageView,
-            nameLabel,
+            nameView,
             infoLabel,
             riceFeedingView,
             waterFeedingView,
@@ -72,7 +72,7 @@ extension MainView {
             $0.size.equalTo(200)
         }
         
-        nameLabel.snp.makeConstraints {
+        nameView.snp.makeConstraints {
             $0.top.equalTo(tamagochiImageView.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
             $0.leading.greaterThanOrEqualToSuperview().inset(80)
@@ -80,7 +80,7 @@ extension MainView {
         }
         
         infoLabel.snp.makeConstraints {
-            $0.top.equalTo(nameLabel.snp.bottom).offset(8)
+            $0.top.equalTo(nameView.snp.bottom).offset(8)
             $0.centerX.equalToSuperview()
             $0.horizontalEdges.equalToSuperview().inset(80)
         }

@@ -13,7 +13,7 @@ final class TamagochiNameView: BaseView {
     
     let nameLabel = UILabel().then {
         $0.text = "TEST"
-        $0.font = .systemFont(ofSize: 14)
+        $0.font = .systemFont(ofSize: 12)
     }
     
     init() {

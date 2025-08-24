@@ -19,6 +19,11 @@ final class TamagochiCell: BaseCollectionViewCell {
     
     let nameView = TamagochiNameView()
     
+    func configureCell(data: Tamagochi) {
+        imageView.image = data.image
+        nameView.nameLabel.text = data.name
+    }
+    
 }
 
 extension TamagochiCell {

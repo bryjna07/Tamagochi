@@ -13,6 +13,12 @@ final class StartDetailViewController: BaseViewController {
     
     let detailView = StartDetailView()
     private let disposeBag = DisposeBag()
+    private let viewModel: StartDetailViewModel
+    
+    init(viewModel: StartDetailViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
     
     override func loadView() {
         view = detailView
@@ -25,9 +31,33 @@ final class StartDetailViewController: BaseViewController {
     
     private func bind() {
         
+        let input = StartDetailViewModel.Input(viewDidLoad: Observable.just(()))
+
+        let output = viewModel.transform(input: input)
+        
+        output.tamagochi
+            .drive(with: self) { owner, value in
+                owner.detailView.imageView.image = value.image
+                owner.detailView.nameView.nameLabel.text = value.name
+                owner.detailView.detailLabel.text = value.text
+            }
+            .disposed(by: disposeBag)
+        
         detailView.cancelButton.rx.tap
             .bind(with: self) { owner, _ in
                 owner.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        detailView.startButton.rx.tap
+            .withLatestFrom(output.tamagochi.asObservable())
+            .bind(with: self) { owner, tamagochi in
+                if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
+                    let vm = MainViewModel(data: tamagochi)
+                    let vc = MainViewController(viewModel: vm)
+                    let nav = UINavigationController(rootViewController: vc)
+                    sceneDelegate.changeRootViewController(nav)
+                }
             }
             .disposed(by: disposeBag)
     }

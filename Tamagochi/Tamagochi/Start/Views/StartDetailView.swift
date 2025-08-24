@@ -11,13 +11,13 @@ import SnapKit
 
 final class StartDetailView: BaseView {
     
-    let containerView = UIView().then {
+    private let containerView = UIView().then {
         $0.backgroundColor = .white
         $0.layer.cornerRadius = 16
         $0.clipsToBounds = true
     }
     
-    private let imageView = UIImageView().then {
+    let imageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
         $0.image = ._1_2
         $0.clipsToBounds = true

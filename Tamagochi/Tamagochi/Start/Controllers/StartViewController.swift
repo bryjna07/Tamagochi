@@ -12,10 +12,8 @@ import RxCocoa
 final class StartViewController: BaseViewController {
     
     private let startView = StartView()
-    private let data = BehaviorRelay(value: [
-        "tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3","tesT1", "TEST2", "TEST3",]
-    )
     private let disposeBag = DisposeBag()
+    private let viewModel = StartViewModel()
     
     override func loadView() {
         view = startView
@@ -33,16 +31,23 @@ final class StartViewController: BaseViewController {
     }
 
     private func bind() {
-        data
-            .asDriver(onErrorDriveWith: .empty())
+        let input = StartViewModel.Input(
+            viewDidLoad: Observable.just(()),
+            modelSelected: startView.collectionView.rx.modelSelected(Tamagochi.self)
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        output.tamagochis
             .drive(startView.collectionView.rx.items(cellIdentifier: TamagochiCell.identifier, cellType: TamagochiCell.self)) { (row, element, cell) in
-                cell.nameView.nameLabel.text = element
+                cell.configureCell(data: element)
             }
             .disposed(by: disposeBag)
         
-        startView.collectionView.rx.modelSelected(String.self)
-            .bind(with: self) { owner, value in
-                let vc = StartDetailViewController()
+        output.selectedTamagochi
+            .drive(with: self) { owner, value in
+                let vm = StartDetailViewModel(data: value)
+                let vc = StartDetailViewController(viewModel: vm)
                 vc.modalPresentationStyle = .overFullScreen
                 vc.modalTransitionStyle = .crossDissolve
                 owner.present(vc, animated: true)
