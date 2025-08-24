@@ -11,9 +11,9 @@ import SnapKit
 
 final class TamagochiNameView: BaseView {
     
-    private let nameLabel = UILabel().then {
+    let nameLabel = UILabel().then {
         $0.text = "TEST"
-        $0.font = .systemFont(ofSize: 16)
+        $0.font = .systemFont(ofSize: 14)
     }
     
     init() {

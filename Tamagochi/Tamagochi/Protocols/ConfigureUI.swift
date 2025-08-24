@@ -1,8 +1,8 @@
 //
 //  ConfigureUI.swift
-//  MovieApp
+//  Tamagochi
 //
-//  Created by YoungJin on 8/2/25.
+//  Created by YoungJin on 8/24/25.
 //
 
 import Foundation
