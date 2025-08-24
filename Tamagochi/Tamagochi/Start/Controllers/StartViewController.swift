@@ -39,6 +39,15 @@ final class StartViewController: BaseViewController {
                 cell.nameView.nameLabel.text = element
             }
             .disposed(by: disposeBag)
+        
+        startView.collectionView.rx.modelSelected(String.self)
+            .bind(with: self) { owner, value in
+                let vc = StartDetailViewController()
+                vc.modalPresentationStyle = .overFullScreen
+                vc.modalTransitionStyle = .crossDissolve
+                owner.present(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
