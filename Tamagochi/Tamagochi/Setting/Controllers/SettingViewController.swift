@@ -11,12 +11,9 @@ import RxCocoa
 
 final class SettingViewController: BaseViewController {
     
-    let settingView = SettingView()
+    private let settingView = SettingView()
     private let disposeBag = DisposeBag()
-    
-    private let data = BehaviorRelay(value: [
-        "내 이름 설정하기", "다마고치 변경하기", "데이터 초기화",]
-    )
+    private let viewModel = SettingViewModel()
     
     override func loadView() {
         view = settingView
@@ -34,10 +31,22 @@ final class SettingViewController: BaseViewController {
     
     private func bind() {
         
-        data
-            .asDriver(onErrorDriveWith: .empty())
+        let input = SettingViewModel.Input(
+            viewDidLoad: Observable.just(()),
+            itemSelected: settingView.tableView.rx.itemSelected.asObservable()
+        )
+           
+        let output = viewModel.transform(input: input)
+        
+        output.items
             .drive(settingView.tableView.rx.items(cellIdentifier: SettingCell.identifier, cellType: SettingCell.self)) { (row, element, cell) in
-                
+                cell.label.text = element
+                            if row == 0 {
+                                let nickname = UserDefaultsManager.shared.selectedTamagochiName
+                                cell.nicknameLabel.text = nickname.isEmpty ? "" : nickname
+                            } else {
+                                cell.nicknameLabel.text = ""
+                            }
             }
             .disposed(by: disposeBag)
         
@@ -46,6 +55,10 @@ final class SettingViewController: BaseViewController {
                 if indexPath.row == 0 {
                     let vc = NicknameViewController()
                     owner.navigationController?.pushViewController(vc, animated: true)
+                } else if indexPath.row == 2 {
+                    owner.showAlert(title: "데이터 초기화", message: "데이터를 초기화 하시겠습니까?", ok: "네") {
+                        UserDefaultsManager.shared.resetAll()
+                    }
                 }
             }
             .disposed(by: disposeBag)
