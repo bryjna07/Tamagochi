@@ -52,6 +52,7 @@ final class MainViewModel {
         input.riceButtonTap
             .map { Int($0) ?? 1 }
             .subscribe(with: self) { owner, count in
+                guard count > 0, count <= 99 else { return }
                 let name = owner.manager.selectedTamagochiName
                 owner.manager.feedRice(name: name, count: count)
                 if let status = owner.manager.status(for: name) {
@@ -67,6 +68,7 @@ final class MainViewModel {
         input.waterButtonTap
             .map { Int($0) ?? 1 }
             .subscribe(with: self) { owner, count in
+                guard count > 0, count <= 49 else { return }
                 let name = owner.manager.selectedTamagochiName
                 owner.manager.feedWater(name: name, count: count)
                 if let status = owner.manager.status(for: name) {

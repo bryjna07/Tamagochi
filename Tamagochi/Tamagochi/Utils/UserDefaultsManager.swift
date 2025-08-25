@@ -26,9 +26,9 @@ final class UserDefaultsManager {
     @UserDefault(key: "selectedTamagochiName", defaultValue: "")
     var selectedTamagochiName: String
     
-    // 최대 갯수
-    private let maxRice = 99
-    private let maxWater = 49
+    // 저장 최대값
+    private let maxRice = 999
+    private let maxWater = 999
     
     func updateStatus(name: String, rice: Int? = nil, water: Int? = nil) {
         var all = tamagochiStatus
@@ -63,16 +63,14 @@ final class UserDefaultsManager {
     func feedRice(name: String, count: Int) {
         guard var status = tamagochiStatus[name] else { return }
         guard status.riceCount + count <= maxRice else { return }
-        status.riceCount += count
-        tamagochiStatus[name] = status
+        updateStatus(name: name, rice: count, water: 0)
     }
     
     // 물 먹기
     func feedWater(name: String, count: Int) {
         guard var status = tamagochiStatus[name] else { return }
         guard status.waterCount + count <= maxWater else { return }
-        status.waterCount += count
-        tamagochiStatus[name] = status
+        updateStatus(name: name, rice: 0, water: count)
     }
     
     func resetAll() {

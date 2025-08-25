@@ -12,7 +12,8 @@ struct TamagochiStatus: Codable {
     var waterCount: Int
     
     var level: Int {
-        let calc = Double(riceCount) / 5 + Double(waterCount) / 2
-        return min(max(Int(calc), 1), 9)
+        let calc = (riceCount / 5) + (waterCount / 2)
+        let level = 1 + (calc / 10)
+        return min(level, 10)
     }
 }
