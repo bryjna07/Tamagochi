@@ -55,10 +55,8 @@ final class StartDetailViewController: BaseViewController {
         output.startButtonTap
             .drive(with: self) { owner, _ in
                 if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
-                    let vm = MainViewModel(data: owner.viewModel.tamagochi)
-                    let vc = MainViewController(viewModel: vm)
-                    let nav = UINavigationController(rootViewController: vc)
-                    sceneDelegate.changeRootViewController(nav)
+                    let tab = TabBarController()
+                    sceneDelegate.changeRootViewController(tab)
                 }
             }
             .disposed(by: disposeBag)

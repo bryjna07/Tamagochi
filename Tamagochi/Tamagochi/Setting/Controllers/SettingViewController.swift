@@ -58,6 +58,11 @@ final class SettingViewController: BaseViewController {
                 } else if indexPath.row == 2 {
                     owner.showAlert(title: "데이터 초기화", message: "데이터를 초기화 하시겠습니까?", ok: "네") {
                         UserDefaultsManager.shared.resetAll()
+                        if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
+                            let startVC = StartViewController()
+                            let nav = UINavigationController(rootViewController: startVC)
+                            sceneDelegate.changeRootViewController(nav)
+                        }
                     }
                 }
             }

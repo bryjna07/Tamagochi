@@ -16,9 +16,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        let nav = UINavigationController(rootViewController: StartViewController())
+        if UserDefaultsManager.shared.selectedTamagochiName.isEmpty {
+            let startVC = StartViewController()
+            let nav = UINavigationController(rootViewController: startVC)
+            window?.rootViewController = nav
+        } else {
+            let tab = TabBarController()
+            window?.rootViewController = tab
+        }
         
-        window?.rootViewController = nav
         window?.makeKeyAndVisible()
     }
 
