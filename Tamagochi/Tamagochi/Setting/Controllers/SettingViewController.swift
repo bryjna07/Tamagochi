@@ -15,7 +15,7 @@ final class SettingViewController: BaseViewController {
     private let disposeBag = DisposeBag()
     
     private let data = BehaviorRelay(value: [
-        "tesT1", "TEST2", "TEST3",]
+        "내 이름 설정하기", "다마고치 변경하기", "데이터 초기화",]
     )
     
     override func loadView() {
@@ -51,5 +51,4 @@ final class SettingViewController: BaseViewController {
             .disposed(by: disposeBag)
         
     }
-
 }

@@ -30,15 +30,15 @@ final class MainView: BaseView {
     
     let nameView = TamagochiNameView()
     
-    private let infoLabel = UILabel().then {
+    let infoLabel = UILabel().then {
         $0.text = "TEST"
         $0.textAlignment = .center
         $0.font = .systemFont(ofSize: 16)
     }
     
-    private let riceFeedingView = FeedingView(placeholder: "밥주세용", buttonImage: UIImage(systemName: "fork.knife.circle"), buttonName: "밥먹기")
+    let riceFeedingView = FeedingView(placeholder: "밥주세용", buttonImage: UIImage(systemName: "fork.knife.circle"), buttonName: "밥먹기")
     
-    private let waterFeedingView = FeedingView(placeholder: "물주세용", buttonImage: UIImage(systemName: "drop.circle"), buttonName: "물먹기")
+    let waterFeedingView = FeedingView(placeholder: "물주세용", buttonImage: UIImage(systemName: "drop.circle"), buttonName: "물먹기")
 }
 
 extension MainView {

@@ -31,13 +31,16 @@ final class StartDetailViewController: BaseViewController {
     
     private func bind() {
         
-        let input = StartDetailViewModel.Input(viewDidLoad: Observable.just(()))
-
+        let input = StartDetailViewModel.Input(
+            viewDidLoad: Observable.just(()),
+            startButtonTap: detailView.startButton.rx.tap.asObservable()
+        )
+        
         let output = viewModel.transform(input: input)
         
         output.tamagochi
             .drive(with: self) { owner, value in
-                owner.detailView.imageView.image = value.image
+                owner.detailView.imageView.image = UIImage(named: value.imageName)
                 owner.detailView.nameView.nameLabel.text = value.name
                 owner.detailView.detailLabel.text = value.text
             }
@@ -49,11 +52,10 @@ final class StartDetailViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
-        detailView.startButton.rx.tap
-            .withLatestFrom(output.tamagochi.asObservable())
-            .bind(with: self) { owner, tamagochi in
+        output.startButtonTap
+            .drive(with: self) { owner, _ in
                 if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
-                    let vm = MainViewModel(data: tamagochi)
+                    let vm = MainViewModel(data: owner.viewModel.tamagochi)
                     let vc = MainViewController(viewModel: vm)
                     let nav = UINavigationController(rootViewController: vc)
                     sceneDelegate.changeRootViewController(nav)
@@ -61,5 +63,4 @@ final class StartDetailViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
     }
-
 }

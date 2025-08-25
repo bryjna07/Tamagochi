@@ -20,7 +20,7 @@ final class TamagochiCell: BaseCollectionViewCell {
     let nameView = TamagochiNameView()
     
     func configureCell(data: Tamagochi) {
-        imageView.image = data.image
+        imageView.image = UIImage(named: data.imageName)
         nameView.nameLabel.text = data.name
     }
     

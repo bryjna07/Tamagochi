@@ -40,17 +40,26 @@ final class MainViewController: BaseViewController {
     
     private func bind() {
         
-        let input = MainViewModel.Input(viewDidLoad: Observable.just(()))
+        let input = MainViewModel.Input(
+            viewDidLoad: Observable.just(()),
+            riceButtonTap: mainView.riceFeedingView.button.rx.tap
+                .withLatestFrom(mainView.riceFeedingView.textField.rx.text.orEmpty),
+            waterButtonTap: mainView.waterFeedingView.button.rx.tap
+                .withLatestFrom(mainView.waterFeedingView.textField.rx.text.orEmpty),
+        )
 
         let output = viewModel.transform(input: input)
         
         output.tamagochi
             .drive(with: self) { owner, value in
-                owner.mainView.tamagochiImageView.image = value.image
+                owner.mainView.tamagochiImageView.image = UIImage(named: value.imageName)
                 owner.mainView.nameView.nameLabel.text = value.name
             }
             .disposed(by: disposeBag)
         
+        output.info
+            .drive(mainView.infoLabel.rx.text)
+            .disposed(by: disposeBag)
         
            profileButton.rx.tap
                .bind(with: self) { owner, _ in
@@ -59,6 +68,4 @@ final class MainViewController: BaseViewController {
                }
                .disposed(by: disposeBag)
        }
-
 }
-

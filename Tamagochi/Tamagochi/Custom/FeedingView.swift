@@ -11,7 +11,7 @@ import SnapKit
 
 final class FeedingView: BaseView {
     
-    private let textField = UITextField().then {
+    let textField = UITextField().then {
         $0.textAlignment = .center
     }
     
@@ -19,7 +19,7 @@ final class FeedingView: BaseView {
         $0.backgroundColor = .black
     }
     
-    private let button = UIButton(type: .system).then {
+    let button = UIButton(type: .system).then {
         var config = UIButton.Configuration.plain()
         config.cornerStyle = .large
         $0.configuration = config
