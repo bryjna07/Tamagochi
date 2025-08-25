@@ -7,11 +7,17 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
-class BoxOfficeViewController: UIViewController {
+final class BoxOfficeViewController: BaseViewController {
+    
+    let disposeBag = DisposeBag()
     
     let tableView = UITableView()
     let searchBar = UISearchBar()
+    
+    let movieList = BehaviorRelay<[Movie]>(value: [])
      
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,7 +26,34 @@ class BoxOfficeViewController: UIViewController {
     }
      
     private func bind() {
-          
+        
+        searchBar.rx.searchButtonClicked
+            .withLatestFrom(searchBar.rx.text.orEmpty)
+            .distinctUntilChanged()
+            .flatMap { text in
+                CustomObservable
+                    .getMovie(date: text)
+            }
+            .subscribe(with: self) { owner, movie in
+               print("onNext", movie)
+                owner.movieList.accept(movie)
+            } onError: { owner, error in
+                print("onError", error)
+            } onCompleted: { owner in
+                print("onCompleted")
+            } onDisposed: { owner in
+                print("onDisposed")
+            }
+            .disposed(by: disposeBag)
+        
+        movieList
+            .bind(to: tableView.rx.items(
+                cellIdentifier: PersonTableViewCell.identifier,
+                cellType: PersonTableViewCell.self)
+            ) { (row, element, cell) in
+                cell.usernameLabel.text = element.movieNm
+            }
+            .disposed(by: disposeBag)
     }
     
     private func configure() {
