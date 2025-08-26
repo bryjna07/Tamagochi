@@ -14,12 +14,18 @@ import RxCocoa
 
 final class LottoViewController: BaseViewController {
     
-    let disposeBag = DisposeBag()
+    private let viewModel: LottoViewModel
+    private let disposeBag = DisposeBag()
     
-    let searchField = FeedingView(placeholder: "로또검색", buttonImage: nil, buttonName: "검색")
+    private let searchField = FeedingView(placeholder: "로또검색", buttonImage: nil, buttonName: "검색")
     
-    let resultLabel = UILabel().then {
+    private let resultLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 20)
+    }
+    
+    init(viewModel: LottoViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
     }
     
     override func viewDidLoad() {
@@ -29,23 +35,37 @@ final class LottoViewController: BaseViewController {
     }
     
     private func bind() {
+//
+        let input = LottoViewModel.Input(
+            searchTap: Observable
+                .merge(
+                    searchField.textField.rx.controlEvent(.editingDidEndOnExit).asObservable(),
+                    searchField.button.rx.tap.asObservable()
+                )
+                .withLatestFrom(searchField.textField.rx.text.orEmpty)
+        )
         
-        searchField.button.rx.tap
-            .withLatestFrom(searchField.textField.rx.text.orEmpty)
-            .distinctUntilChanged()
-            .flatMap { text in
-                CustomObservable
-                    .getLotto(query: text)
-            }
-            .subscribe(with: self) { owner, lotto in
-               print("onNext", lotto)
-                owner.resultLabel.text = lotto.allLotto
-            } onError: { owner, error in
-                print("onError", error)
-            } onCompleted: { owner in
-                print("onCompleted")
-            } onDisposed: { owner in
-                print("onDisposed")
+//        let a =  searchField.textField.rx.controlEvent(.editingDidEndOnExit).asObservable()
+//                        .withLatestFrom(searchField.textField.rx.text.orEmpty)
+//        let b = Observable
+//            .merge(
+//                searchField.textField.rx.controlEvent(.editingDidEndOnExit).asObservable(),
+//                searchField.button.rx.tap.asObservable()
+//            )
+//            .withLatestFrom(searchField.textField.rx.text.orEmpty)
+//        let c = searchField.button.rx.tap
+//            .withLatestFrom(searchField.textField.rx.text.orEmpty)
+            
+        let output = viewModel.transform(input: input)
+        
+        output.lotto
+            .drive(with: self) { owner, response in
+                switch response {
+                case .success(let lotto):
+                    owner.resultLabel.text = lotto.allLotto
+                case .failure(let error):
+                    owner.view.makeToast(error.errorText, position: .top)
+                }
             }
             .disposed(by: disposeBag)
     }
@@ -66,7 +86,7 @@ final class LottoViewController: BaseViewController {
             $0.top.equalTo(searchField.snp.bottom).offset(20)
             $0.horizontalEdges.equalToSuperview().inset(40)
         }
+        
+        searchField.textField.returnKeyType = .done
     }
-    
 }
- 

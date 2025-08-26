@@ -9,15 +9,20 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import Toast
 
 final class BoxOfficeViewController: BaseViewController {
     
-    let disposeBag = DisposeBag()
+    private let viewModel: BoxOfficeViewModel
+    private let disposeBag = DisposeBag()
     
-    let tableView = UITableView()
-    let searchBar = UISearchBar()
+    private let tableView = UITableView()
+    private let searchBar = UISearchBar()
     
-    let movieList = BehaviorRelay<[Movie]>(value: [])
+    init(viewModel: BoxOfficeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
      
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,26 +32,27 @@ final class BoxOfficeViewController: BaseViewController {
      
     private func bind() {
         
-        searchBar.rx.searchButtonClicked
-            .withLatestFrom(searchBar.rx.text.orEmpty)
-            .distinctUntilChanged()
-            .flatMap { text in
-                CustomObservable
-                    .getMovie(date: text)
-            }
-            .subscribe(with: self) { owner, movie in
-               print("onNext", movie)
-                owner.movieList.accept(movie)
-            } onError: { owner, error in
-                print("onError", error)
-            } onCompleted: { owner in
-                print("onCompleted")
-            } onDisposed: { owner in
-                print("onDisposed")
+        let input = BoxOfficeViewModel.Input(
+            searchTap: searchBar.rx.searchButtonClicked
+                .withLatestFrom(searchBar.rx.text.orEmpty)
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        let list = BehaviorRelay<[Movie]>(value: [])
+        
+        output.movie
+            .drive(with: self) { owner, reponse in
+                switch reponse {
+                case .success(let value):
+                    list.accept(value.boxOffice.movieList)
+                case .failure(let error):
+                    owner.view.makeToast(error.errorText, position: .top)
+                }
             }
             .disposed(by: disposeBag)
-        
-        movieList
+
+        list
             .bind(to: tableView.rx.items(
                 cellIdentifier: PersonTableViewCell.identifier,
                 cellType: PersonTableViewCell.self)

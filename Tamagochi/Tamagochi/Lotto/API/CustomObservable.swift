@@ -9,29 +9,24 @@ import Foundation
 import Alamofire
 import RxSwift
 
-enum CustomError: Error {
-    case invalid
-}
-
 final class CustomObservable {
     
-    static func getLotto(query: String) -> Observable<Lotto> {
+    static func getLotto(query: String) -> Observable<Result<Lotto, CustomError>> {
         
-        return Observable<Lotto>.create { observer in
+        return Observable<Result<Lotto, CustomError>>.create { observer in
             
             let url = "\(URL.lotto.baseURL)&drwNo=\(query)"
             
             AF.request(url).responseDecodable(of: Lotto.self) { response in
                 switch response.result {
                 case .success(let value):
-//                    print(value)
-                    
-                    observer.onNext(value)
+                    observer.onNext(.success(value))
                     observer.onCompleted() // 매우중요
                     
                 case .failure(let error):
-//                    print(error)
-                    observer.onError(CustomError.invalid)
+                    print(error)
+                    observer.onNext(.failure(.invalid))
+                    observer.onCompleted()
                 }
             }
             
@@ -40,23 +35,22 @@ final class CustomObservable {
         }
     }
     
-    static func getMovie(date: String) -> Observable<[Movie]> {
+    static func getMovie(date: String) -> Single<Result<BoxOffice, CustomError>> {
         
-        return Observable<[Movie]>.create { observer in
+        return Single.create { observer in
             
             let url = "\(URL.movie.baseURL)key=\(MovieAPI.Key)&targetDt=\(date)"
             
             AF.request(url).responseDecodable(of: BoxOffice.self) { response in
                 switch response.result {
                 case .success(let value):
+                    print("API 성공")
 //                    print(value)
-                    
-                    observer.onNext(value.boxOffice.movieList)
-                    observer.onCompleted() // 매우중요
+                    observer(.success(.success(value)))
                     
                 case .failure(let error):
-//                    print(error)
-                    observer.onError(CustomError.invalid)
+                    print(error)
+                    observer(.success(.failure(.invalid)))
                 }
             }
             
@@ -64,4 +58,29 @@ final class CustomObservable {
             
         }
     }
+    
+//    static func getMovie(date: String) -> Observable<[Movie]> {
+//        
+//        return Observable<[Movie]>.create { observer in
+//            
+//            let url = "\(URL.movie.baseURL)key=\(MovieAPI.Key)&targetDt=\(date)"
+//            
+//            AF.request(url).responseDecodable(of: BoxOffice.self) { response in
+//                switch response.result {
+//                case .success(let value):
+////                    print(value)
+//                    
+//                    observer.onNext(value.boxOffice.movieList)
+//                    observer.onCompleted() // 매우중요
+//                    
+//                case .failure(let error):
+////                    print(error)
+//                    observer.onError(CustomError.invalid)
+//                }
+//            }
+//            
+//            return Disposables.create()
+//            
+//        }
+//    }
 }

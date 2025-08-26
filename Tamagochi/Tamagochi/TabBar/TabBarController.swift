@@ -34,8 +34,9 @@ final class TabBarController: UITabBarController {
             )
         }
         
-        let upComingVC = LottoViewController()
-        let second = UINavigationController(rootViewController: upComingVC).then {
+        let lottoVM = LottoViewModel()
+        let lottoVC = LottoViewController(viewModel: lottoVM)
+        let second = UINavigationController(rootViewController: lottoVC).then {
             $0.tabBarItem = UITabBarItem(
                 title: "로또",
                 image: nil,
@@ -43,7 +44,8 @@ final class TabBarController: UITabBarController {
             )
         }
         
-        let boxOfiiceVC = BoxOfficeViewController()
+        let boxOfficeVM = BoxOfficeViewModel()
+        let boxOfiiceVC = BoxOfficeViewController(viewModel: boxOfficeVM)
         let third = UINavigationController(rootViewController: boxOfiiceVC).then {
             $0.tabBarItem = UITabBarItem(
                 title: "영화",
