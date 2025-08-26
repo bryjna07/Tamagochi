@@ -57,7 +57,11 @@ final class SettingViewController: BaseViewController {
                     owner.navigationController?.pushViewController(vc, animated: true)
                 } else if indexPath.row == 2 {
                     owner.showAlert(title: "데이터 초기화", message: "데이터를 초기화 하시겠습니까?", ok: "네") {
-                        UserDefaultsManager.shared.tamagochiData = []
+                        UserDefaultsManager.shared.tamagochiData = [
+                            TamagochiData(name: "따끔따끔 다마고치", level: 1, riceCount: 0, waterCount: 0, isSelected: false),
+                            TamagochiData(name: "방실방실 다마고치", level: 1, riceCount: 0, waterCount: 0, isSelected: false),
+                            TamagochiData(name: "반짝반짝 다마고치", level: 1, riceCount: 0, waterCount: 0, isSelected: false)
+                        ]
                         if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
                             let startVC = StartViewController()
                             let nav = UINavigationController(rootViewController: startVC)

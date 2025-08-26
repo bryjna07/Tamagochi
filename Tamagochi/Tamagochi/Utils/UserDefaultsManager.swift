@@ -21,4 +21,9 @@ final class UserDefaultsManager {
     func selectedTamagochi() -> TamagochiData? {
         return tamagochiData.first { $0.isSelected }
     }
+
+    func updateSelectedTamagochi(_ tamagochi: TamagochiData) {
+        guard let index = tamagochiData.firstIndex(where: { $0.name == tamagochi.name }) else { return }
+        tamagochiData[index] = tamagochi
+    }
 }

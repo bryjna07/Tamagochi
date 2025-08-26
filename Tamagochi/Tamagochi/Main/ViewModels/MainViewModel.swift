@@ -41,26 +41,62 @@ final class MainViewModel {
                 if let selectedData = owner.manager.selectedTamagochi() {
                     let tamagochi = selectedData.tamagochi
                     tamagochiRelay.accept(tamagochi)
-                    let info = owner.caculateLevel(tamagochi: selectedData)
-                    infoRelay.accept(info)
+                    infoRelay.accept(owner.makeInfoText(for: selectedData))
                 }
             }
             .disposed(by: disposeBag)
         
         // 밥 먹기
         input.riceButtonTap
-            .map { Int($0) ?? 1 }
-            .subscribe(with: self) { owner, count in
-                guard count > 0, count <= 99 else { return }
-        
+            .subscribe(with: self) { owner, text in
+                let count: Int
+                if text.isEmpty {
+                    count = 1
+                } else if let num = Int(text), num >= 1, num <= 99 {
+                    count = num
+                } else {
+//                    owner.showAlert(title: "입력 오류", message: "1~99 사이의 숫자를 입력해주세요.")
+                    return
+                }
+                
+                guard var tamagochiData = owner.manager.selectedTamagochi() else { return }
+                // 최대 riceCount 999 체크
+                tamagochiData.riceCount = min(tamagochiData.riceCount + count, 999)
+                // 레벨 계산
+                let calc = (tamagochiData.riceCount / 5) + (tamagochiData.waterCount / 2)
+                tamagochiData.level = min(1 + (calc / 10), 10)
+                owner.manager.updateSelectedTamagochi(tamagochiData)
+                if let updated = owner.manager.selectedTamagochi() {
+                    tamagochiRelay.accept(updated.tamagochi)
+                    infoRelay.accept(owner.makeInfoText(for: updated))
+                }
             }
             .disposed(by: disposeBag)
-        
+
         // 물 먹기
         input.waterButtonTap
-            .map { Int($0) ?? 1 }
-            .subscribe(with: self) { owner, count in
-     
+            .subscribe(with: self) { owner, text in
+                let count: Int
+                if text.isEmpty {
+                    count = 1
+                } else if let num = Int(text), num >= 1, num <= 49 {
+                    count = num
+                } else {
+//                    owner.showAlert(title: "입력 오류", message: "1~49 사이의 숫자를 입력해주세요.")
+                    return
+                }
+                
+                guard var tamagochiData = owner.manager.selectedTamagochi() else { return }
+                // 최대 waterCount 999 체크
+                tamagochiData.waterCount = min(tamagochiData.waterCount + count, 999)
+                // 레벨 계산
+                let calc = (tamagochiData.riceCount / 5) + (tamagochiData.waterCount / 2)
+                tamagochiData.level = min(1 + (calc / 10), 10)
+                owner.manager.updateSelectedTamagochi(tamagochiData)
+                if let updated = owner.manager.selectedTamagochi() {
+                    tamagochiRelay.accept(updated.tamagochi)
+                    infoRelay.accept(owner.makeInfoText(for: updated))
+                }
             }
             .disposed(by: disposeBag)
         
@@ -70,23 +106,7 @@ final class MainViewModel {
         )
     }
     
-    func caculateLevel(tamagochi: TamagochiData) -> String {
-        let calc = (tamagochi.riceCount / 5) + (tamagochi.waterCount / 2)
-        let level = 1 + (calc / 10)
-        
-        return "LV\(min(level, 10)) - 밥알 \(tamagochi.riceCount)개 - 물방울 \(tamagochi.waterCount)개"
+    private func makeInfoText(for tamagochi: TamagochiData) -> String {
+        return "LV\(tamagochi.level) - 밥 \(tamagochi.riceCount)개 - 물방울 \(tamagochi.waterCount)개"
     }
-    
-//    var imageName: String {
-//        switch name {
-//        case "따끔따끔 다마고치":
-//            return "1-\(level)"
-//        case "방실방실 다마고치":
-//            return "2-\(level)"
-//        case "반짝반짝 다마고치":
-//            return "3-\(level)"
-//        default:
-//            return "noImage"
-//        }
-//    }
 }
