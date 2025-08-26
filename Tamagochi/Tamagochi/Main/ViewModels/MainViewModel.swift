@@ -12,7 +12,7 @@ import RxCocoa
 final class MainViewModel {
     
     private let disposeBag = DisposeBag()
-    let tamagochi: Tamagochi
+    let tamagochi: TamagochiData?
     let manager = UserDefaultsManager.shared
     
     struct Input {
@@ -26,7 +26,7 @@ final class MainViewModel {
         let info: Driver<String>
     }
     
-    init(data: Tamagochi) {
+    init(data: TamagochiData?) {
         self.tamagochi = data
     }
     
@@ -38,12 +38,11 @@ final class MainViewModel {
         // 선택된 다마고치 꺼내오기
         input.viewDidLoad
             .subscribe(with: self) { owner, _ in
-                let name = owner.manager.selectedTamagochiName
-                if let status = owner.manager.status(for: name) {
-                    let imageName = owner.manager.image(tamagochiName: name)
-                    let model = Tamagochi(name: name, imageName: imageName, text: "임시", isAvailable: true)
-                    tamagochiRelay.accept(model)
-                    infoRelay.accept("LV\(status.level) - 밥알 \(status.riceCount)개 - 물방울 \(status.waterCount)개")
+                if let selectedData = owner.manager.selectedTamagochi() {
+                    let tamagochi = selectedData.tamagochi
+                    tamagochiRelay.accept(tamagochi)
+                    let info = owner.caculateLevel(tamagochi: selectedData)
+                    infoRelay.accept(info)
                 }
             }
             .disposed(by: disposeBag)
@@ -53,14 +52,7 @@ final class MainViewModel {
             .map { Int($0) ?? 1 }
             .subscribe(with: self) { owner, count in
                 guard count > 0, count <= 99 else { return }
-                let name = owner.manager.selectedTamagochiName
-                owner.manager.feedRice(name: name, count: count)
-                if let status = owner.manager.status(for: name) {
-                    let imageName = owner.manager.image(tamagochiName: name)
-                    let model = Tamagochi(name: name, imageName: imageName, text: "임시", isAvailable: true)
-                    tamagochiRelay.accept(model)
-                    infoRelay.accept("LV\(status.level) - 밥알 \(status.riceCount)개 - 물방울 \(status.waterCount)개")
-                }
+        
             }
             .disposed(by: disposeBag)
         
@@ -68,15 +60,7 @@ final class MainViewModel {
         input.waterButtonTap
             .map { Int($0) ?? 1 }
             .subscribe(with: self) { owner, count in
-                guard count > 0, count <= 49 else { return }
-                let name = owner.manager.selectedTamagochiName
-                owner.manager.feedWater(name: name, count: count)
-                if let status = owner.manager.status(for: name) {
-                    let imageName = owner.manager.image(tamagochiName: name)
-                    let model = Tamagochi(name: name, imageName: imageName, text: "임시", isAvailable: true)
-                    tamagochiRelay.accept(model)
-                    infoRelay.accept("LV\(status.level) - 밥알 \(status.riceCount)개 - 물방울 \(status.waterCount)개")
-                }
+     
             }
             .disposed(by: disposeBag)
         
@@ -85,4 +69,24 @@ final class MainViewModel {
             info: infoRelay.asDriver(onErrorDriveWith: .empty())
         )
     }
+    
+    func caculateLevel(tamagochi: TamagochiData) -> String {
+        let calc = (tamagochi.riceCount / 5) + (tamagochi.waterCount / 2)
+        let level = 1 + (calc / 10)
+        
+        return "LV\(min(level, 10)) - 밥알 \(tamagochi.riceCount)개 - 물방울 \(tamagochi.waterCount)개"
+    }
+    
+//    var imageName: String {
+//        switch name {
+//        case "따끔따끔 다마고치":
+//            return "1-\(level)"
+//        case "방실방실 다마고치":
+//            return "2-\(level)"
+//        case "반짝반짝 다마고치":
+//            return "3-\(level)"
+//        default:
+//            return "noImage"
+//        }
+//    }
 }

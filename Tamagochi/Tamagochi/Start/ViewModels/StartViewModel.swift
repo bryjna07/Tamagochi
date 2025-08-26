@@ -31,13 +31,16 @@ final class StartViewModel {
         let tamagochiRelay = BehaviorRelay<[Tamagochi]>(value: [])
         
         input.viewDidLoad
-            .map { Tamagochi.makeTamagochi() }
-                   .bind(to: tamagochiRelay)
-                   .disposed(by: disposeBag)
+            .map {  let selectedTamagochis = UserDefaultsManager.shared.tamagochiData.map { $0.tamagochi }
+                let testTamagochis = Array(repeating: Tamagochi(name: "준비중이에요", imageName: "noImage", text: "", isAvailable: false), count: 27)
+                return selectedTamagochis + testTamagochis
+            }
+            .bind(to: tamagochiRelay)
+            .disposed(by: disposeBag)
         
         let selected = input.modelSelected
-                    .filter { $0.isAvailable }
-                    .asDriver(onErrorDriveWith: .empty())
+            .filter { $0.isAvailable }
+            .asDriver(onErrorDriveWith: .empty())
         
         return Output(tamagochis: tamagochiRelay.asDriver(),
                       selectedTamagochi: selected

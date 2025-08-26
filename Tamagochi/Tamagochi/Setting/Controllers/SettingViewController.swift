@@ -42,8 +42,8 @@ final class SettingViewController: BaseViewController {
             .drive(settingView.tableView.rx.items(cellIdentifier: SettingCell.identifier, cellType: SettingCell.self)) { (row, element, cell) in
                 cell.label.text = element
                             if row == 0 {
-                                let nickname = UserDefaultsManager.shared.selectedTamagochiName
-                                cell.nicknameLabel.text = nickname.isEmpty ? "" : nickname
+                                let nickname = UserDefaultsManager.shared.selectedTamagochi()?.name
+                                cell.nicknameLabel.text = nickname
                             } else {
                                 cell.nicknameLabel.text = ""
                             }
@@ -57,7 +57,7 @@ final class SettingViewController: BaseViewController {
                     owner.navigationController?.pushViewController(vc, animated: true)
                 } else if indexPath.row == 2 {
                     owner.showAlert(title: "데이터 초기화", message: "데이터를 초기화 하시겠습니까?", ok: "네") {
-                        UserDefaultsManager.shared.resetAll()
+                        UserDefaultsManager.shared.tamagochiData = []
                         if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
                             let startVC = StartViewController()
                             let nav = UINavigationController(rootViewController: startVC)

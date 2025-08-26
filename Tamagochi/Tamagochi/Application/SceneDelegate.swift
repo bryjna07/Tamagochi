@@ -16,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        if UserDefaultsManager.shared.selectedTamagochiName.isEmpty {
+        if UserDefaultsManager.shared.selectedTamagochi() == nil {
             let startVC = StartViewController()
             let nav = UINavigationController(rootViewController: startVC)
             window?.rootViewController = nav
@@ -40,4 +40,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
 }
-

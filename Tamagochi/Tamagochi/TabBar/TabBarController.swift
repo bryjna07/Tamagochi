@@ -20,9 +20,7 @@ final class TabBarController: UITabBarController {
     
     private func setupViewControllers() {
         let manager = UserDefaultsManager.shared
-        let name = manager.selectedTamagochiName
-        let imageName = manager.image(tamagochiName: name)
-        let model = Tamagochi(name: name, imageName: imageName, text: "임시", isAvailable: true)
+        let model = manager.selectedTamagochi()
         
         let mainVM = MainViewModel(data: model)
         let mainVC = MainViewController(viewModel: mainVM)
