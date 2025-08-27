@@ -12,6 +12,17 @@ import Then
 
 final class TabBarController: UITabBarController {
     
+    private let data: TamagochiData
+    
+    init(data: TamagochiData) {
+        self.data = data
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTabBar()
@@ -19,10 +30,8 @@ final class TabBarController: UITabBarController {
     }
     
     private func setupViewControllers() {
-        let manager = UserDefaultsManager.shared
-        let model = manager.selectedTamagochi()
         
-        let mainVM = MainViewModel(data: model)
+        let mainVM = MainViewModel(data: data)
         let mainVC = MainViewController(viewModel: mainVM)
         let first = UINavigationController(rootViewController: mainVC).then {
             $0.tabBarItem = UITabBarItem(

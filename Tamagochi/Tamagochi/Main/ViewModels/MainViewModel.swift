@@ -12,7 +12,7 @@ import RxCocoa
 final class MainViewModel {
     
     private let disposeBag = DisposeBag()
-    let tamagochi: TamagochiData?
+    var tamagochi: TamagochiData
     let manager = UserDefaultsManager.shared
     
     struct Input {
@@ -24,30 +24,24 @@ final class MainViewModel {
     
     struct Output {
         let navTitle: Driver<String>
-        let tamagochi: Driver<Tamagochi>
-        let info: Driver<String>
+        let tamagochi: Driver<TamagochiData>
         let showAlert: Driver<TamagochiError>
     }
     
-    init(data: TamagochiData?) {
+    init(data: TamagochiData) {
         self.tamagochi = data
     }
     
     func transform(input: Input) -> Output {
         
         let title = PublishRelay<String>()
-        let tamagochiRelay = BehaviorRelay<Tamagochi?>(value: nil)
-        let infoRelay = BehaviorRelay(value: "")
+        let tamagochiRelay = BehaviorRelay<TamagochiData?>(value: nil)
         let textError = PublishRelay<TamagochiError>()
         
         // 선택된 다마고치 꺼내오기
         input.viewDidLoad
             .subscribe(with: self) { owner, _ in
-                if let selectedData = owner.manager.selectedTamagochi() {
-                    let tamagochi = selectedData.tamagochi
-                    tamagochiRelay.accept(tamagochi)
-                    infoRelay.accept(owner.makeInfoText(for: selectedData))
-                }
+                tamagochiRelay.accept(owner.tamagochi)
             }
             .disposed(by: disposeBag)
         
@@ -71,10 +65,7 @@ final class MainViewModel {
                     textError.accept(error)
                 }
                 owner.updateTamagochi(num: num, type: .rice)
-                if let updated = owner.manager.selectedTamagochi() {
-                    tamagochiRelay.accept(updated.tamagochi)
-                    infoRelay.accept(owner.makeInfoText(for: updated))
-                }
+                tamagochiRelay.accept(owner.tamagochi)
             }
             .disposed(by: disposeBag)
 
@@ -91,22 +82,14 @@ final class MainViewModel {
                     textError.accept(error)
                 }
                 owner.updateTamagochi(num: num, type: .water)
-                if let updated = owner.manager.selectedTamagochi() {
-                    tamagochiRelay.accept(updated.tamagochi)
-                    infoRelay.accept(owner.makeInfoText(for: updated))
-                }
+                tamagochiRelay.accept(owner.tamagochi)
             }
             .disposed(by: disposeBag)
         
         return Output(navTitle: title.asDriver(onErrorDriveWith: .empty()),
                       tamagochi: tamagochiRelay.compactMap { $0 }.asDriver(onErrorDriveWith: .empty()),
-                      info: infoRelay.asDriver(onErrorDriveWith: .empty()),
                       showAlert: textError.asDriver(onErrorDriveWith: .empty())
         )
-    }
-    
-    private func makeInfoText(for tamagochi: TamagochiData) -> String {
-        return "LV\(tamagochi.level) - 밥 \(tamagochi.riceCount)개 - 물방울 \(tamagochi.waterCount)개"
     }
     
     private func textValidation(text: String, type: FeedType) throws(TamagochiError) -> Int {
@@ -130,18 +113,17 @@ final class MainViewModel {
     }
     
     private func updateTamagochi(num: Int, type: FeedType) {
-        guard var tamagochiData = manager.selectedTamagochi() else { return }
         
         switch type {
         case .rice:
-            tamagochiData.riceCount = min(tamagochiData.riceCount + num, 999)
+            tamagochi.riceCount = min(tamagochi.riceCount + num, 999)
         case .water:
-            tamagochiData.waterCount = min(tamagochiData.waterCount + num, 999)
+            tamagochi.waterCount = min(tamagochi.waterCount + num, 999)
         }
         
         // 레벨 계산
-        let calc = (tamagochiData.riceCount / 5) + (tamagochiData.waterCount / 2)
-        tamagochiData.level = min(1 + (calc / 10), 10)
-        manager.updateSelectedTamagochi(tamagochiData)
+        let calc = (tamagochi.riceCount / 5) + (tamagochi.waterCount / 2)
+        tamagochi.level = min(1 + (calc / 10), 10)
+        manager.updateSelectedTamagochi(tamagochi)
     }
 }

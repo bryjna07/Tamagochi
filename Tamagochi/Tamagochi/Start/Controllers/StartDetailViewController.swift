@@ -53,9 +53,9 @@ final class StartDetailViewController: BaseViewController {
             .disposed(by: disposeBag)
         
         output.startButtonTap
-            .drive(with: self) { owner, _ in
+            .drive(with: self) { owner, value in
                 if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
-                    let tab = TabBarController()
+                    let tab = TabBarController(data: value)
                     sceneDelegate.changeRootViewController(tab)
                 }
             }

@@ -19,7 +19,6 @@ final class StartDetailView: BaseView {
     
     let imageView = UIImageView().then {
         $0.contentMode = .scaleAspectFill
-        $0.image = ._1_2
         $0.clipsToBounds = true
     }
     
@@ -30,7 +29,6 @@ final class StartDetailView: BaseView {
     }
     
     let detailLabel = UILabel().then {
-        $0.text = "저는 방실방실 다마고치 입니당 키는 100km 몸무게는 150톤이에용 성격은 화끈하고 날라다닙니당~! 열심히 잘 먹고 잘 클 자신은 있답니당 방실방실!"
         $0.font = .systemFont(ofSize: 14)
         $0.numberOfLines = 0
         $0.textAlignment = .center

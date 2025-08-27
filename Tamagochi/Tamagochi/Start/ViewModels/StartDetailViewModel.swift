@@ -22,7 +22,7 @@ final class StartDetailViewModel {
     
     struct Output {
         let tamagochi: Driver<Tamagochi>
-        let startButtonTap: Driver<Void>
+        let startButtonTap: Driver<TamagochiData>
     }
     
     init(data: Tamagochi) {
@@ -30,9 +30,11 @@ final class StartDetailViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let tamagochiRelay = BehaviorRelay<Tamagochi>(value: Tamagochi(name: "준비중입니다", imageName: "noImage", text: "", isAvailable: true))
         
-        let startRelay = PublishRelay<Void>()
+        /// publishRelay가 안되는 이유 생각해보기
+        let tamagochiRelay = BehaviorRelay<Tamagochi?>(value: nil)
+        
+        let startRelay = PublishRelay<TamagochiData>()
         
         input.viewDidLoad
             .bind(with: self) { owner, _ in
@@ -45,33 +47,25 @@ final class StartDetailViewModel {
                 var allData = UserDefaultsManager.shared.tamagochiData
                 
                 // 기존 모든 다마고치 선택 해제
-                     allData = allData.map { data in
-                         var mutable = data
-                         mutable.isSelected = false
-                         return mutable
-                     }
-
-                     if let index = allData.firstIndex(where: { $0.name == owner.tamagochi.name }) {
-                         // 이미 존재하는 다마고치면 선택 상태만 변경
-                         allData[index].isSelected = true
-                     } else {
-                         // 처음 선택된 다마고치면 새로 추가
-                         let selected = TamagochiData(
-                             name: owner.tamagochi.name,
-                             level: 1,
-                             riceCount: 0,
-                             waterCount: 0,
-                             isSelected: true
-                         )
-                         allData.append(selected)
-                     }
-                UserDefaultsManager.shared.tamagochiData = allData
-                startRelay.accept(())
+                allData = allData.map { data in
+                    var mutable = data
+                    mutable.isSelected = false
+                    return mutable
+                }
+                
+                if let index = allData.firstIndex(where: { $0.name == owner.tamagochi.name }) {
+                    // 이름 같은 다마고치 인덱스 탐색
+                    var tamagochiData = allData[index]
+                    tamagochiData.isSelected = true
+                    UserDefaultsManager.shared.tamagochiData = allData
+                    startRelay.accept(tamagochiData)
+                    print("탭바로 이동", tamagochiData)
+                }
             }
             .disposed(by: disposeBag)
         
         return Output(
-            tamagochi: tamagochiRelay.asDriver(onErrorDriveWith: .empty()),
+            tamagochi: tamagochiRelay.compactMap { $0 } .asDriver(onErrorDriveWith: .empty()),
             startButtonTap: startRelay.asDriver(onErrorDriveWith: .empty())
         )
     }
