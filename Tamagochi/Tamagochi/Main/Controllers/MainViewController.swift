@@ -63,6 +63,13 @@ final class MainViewController: BaseViewController {
             }
             .disposed(by: disposeBag)
         
+        output.showAlert
+            .drive(with: self) { owner, value in
+                owner.showAlert(title: "입력오류", message: value.errorText, ok: "확인") { }
+            }
+            .disposed(by: disposeBag)
+            
+        
         output.tamagochi
             .drive(with: self) { owner, value in
                 owner.mainView.tamagochiImageView.image = UIImage(named: value.imageName)
