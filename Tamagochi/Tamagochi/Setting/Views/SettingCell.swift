@@ -23,7 +23,6 @@ final class SettingCell: BaseTableViewCell {
     }
     
     let nicknameLabel = UILabel().then {
-        $0.text = "고래밥"
         $0.font = .systemFont(ofSize: 14)
     }
     

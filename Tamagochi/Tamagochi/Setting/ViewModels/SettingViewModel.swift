@@ -15,7 +15,8 @@ final class SettingViewModel {
     private let data = ["내 이름 설정하기", "다마고치 변경하기", "데이터 초기화",]
     
     struct Input {
-        let viewDidLoad: Observable<Void>
+//        let viewDidLoad: Observable<Void>
+        let viewWillAppear: Observable<Void>
         let itemSelected: Observable<IndexPath>
     }
     
@@ -29,12 +30,18 @@ final class SettingViewModel {
         
         let data = BehaviorRelay<[String]>(value: [])
         
-        input.viewDidLoad
+//        input.viewDidLoad
+//            .subscribe(with: self) { owner, _ in
+//                data.accept(owner.data)
+//            }
+//            .disposed(by: disposeBag)
+        
+        input.viewWillAppear
             .subscribe(with: self) { owner, _ in
                 data.accept(owner.data)
             }
             .disposed(by: disposeBag)
-        
+
         return Output(items: data.asDriver())
     }
 }

@@ -18,6 +18,9 @@ final class UserDefaultsManager {
     ])
     var tamagochiData: [TamagochiData]
     
+    @UserDefault(key: "userName", defaultValue: "대장")
+    var userName: String
+    
     func selectedTamagochi() -> TamagochiData? {
         return tamagochiData.first { $0.isSelected }
     }

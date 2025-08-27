@@ -17,11 +17,13 @@ final class MainViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
+        let viewWillAppear: Observable<Void>
         let riceButtonTap: Observable<String>
         let waterButtonTap: Observable<String>
     }
     
     struct Output {
+        let navTitle: Driver<String>
         let tamagochi: Driver<Tamagochi>
         let info: Driver<String>
     }
@@ -32,6 +34,7 @@ final class MainViewModel {
     
     func transform(input: Input) -> Output {
         
+        let title = PublishRelay<String>()
         let tamagochiRelay = BehaviorRelay<Tamagochi?>(value: nil)
         let infoRelay = BehaviorRelay(value: "")
         
@@ -43,6 +46,13 @@ final class MainViewModel {
                     tamagochiRelay.accept(tamagochi)
                     infoRelay.accept(owner.makeInfoText(for: selectedData))
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        input.viewWillAppear
+            .asDriver(onErrorDriveWith: .empty())
+            .drive(with: self) { owenr, _ in
+                title.accept(UserDefaultsManager.shared.userName)
             }
             .disposed(by: disposeBag)
         
@@ -100,7 +110,7 @@ final class MainViewModel {
             }
             .disposed(by: disposeBag)
         
-        return Output(
+        return Output(navTitle: title.asDriver(onErrorDriveWith: .empty()),
             tamagochi: tamagochiRelay.compactMap { $0 }.asDriver(onErrorDriveWith: .empty()),
             info: infoRelay.asDriver(onErrorDriveWith: .empty())
         )

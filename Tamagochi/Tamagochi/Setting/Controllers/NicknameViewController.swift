@@ -34,9 +34,10 @@ final class NicknameViewController: BaseViewController {
     private func bind() {
 
         saveButton.rx.tap
-            .bind(with: self) { owner, _ in
-                print("click")
-                //알럿
+            .withLatestFrom(nicknameView.textField.rx.text.orEmpty)
+            .bind(with: self) { owner, text in
+                UserDefaultsManager.shared.userName = text
+                owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
     }

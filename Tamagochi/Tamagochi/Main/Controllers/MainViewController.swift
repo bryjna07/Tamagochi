@@ -14,6 +14,7 @@ final class MainViewController: BaseViewController {
     private let mainView = MainView()
     private let viewModel: MainViewModel
     private let disposeBag = DisposeBag()
+    private let viewWillAppearRelay = PublishRelay<Void>()
     
     private lazy var profileButton = UIBarButtonItem(image: UIImage(systemName: "person.circle"), style: .plain, target: nil, action: nil)
     
@@ -31,17 +32,23 @@ final class MainViewController: BaseViewController {
         view.backgroundColor = .white
         bind()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewWillAppearRelay.accept(())
+    }
 
     override func setupNaviBar() {
         super.setupNaviBar()
-        navigationItem.title = "대장님의 다마고치"
         navigationItem.rightBarButtonItem = profileButton
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     private func bind() {
         
         let input = MainViewModel.Input(
             viewDidLoad: Observable.just(()),
+            viewWillAppear: viewWillAppearRelay.asObservable(),
             riceButtonTap: mainView.riceFeedingView.button.rx.tap
                 .withLatestFrom(mainView.riceFeedingView.textField.rx.text.orEmpty),
             waterButtonTap: mainView.waterFeedingView.button.rx.tap
@@ -49,6 +56,12 @@ final class MainViewController: BaseViewController {
         )
 
         let output = viewModel.transform(input: input)
+        
+        output.navTitle
+            .drive(with: self) { owner, value in
+                owner.navigationItem.title = "\(value)님의 다마고치"
+            }
+            .disposed(by: disposeBag)
         
         output.tamagochi
             .drive(with: self) { owner, value in

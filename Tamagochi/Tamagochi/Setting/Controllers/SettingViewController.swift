@@ -14,6 +14,7 @@ final class SettingViewController: BaseViewController {
     private let settingView = SettingView()
     private let disposeBag = DisposeBag()
     private let viewModel = SettingViewModel()
+    private let viewWillAppearRelay = PublishRelay<Void>()
     
     override func loadView() {
         view = settingView
@@ -24,6 +25,11 @@ final class SettingViewController: BaseViewController {
         bind()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        viewWillAppearRelay.accept(())
+    }
+    
     override func setupNaviBar() {
         super.setupNaviBar()
         navigationItem.title = "설정"
@@ -32,7 +38,8 @@ final class SettingViewController: BaseViewController {
     private func bind() {
         
         let input = SettingViewModel.Input(
-            viewDidLoad: Observable.just(()),
+//            viewDidLoad: Observable.just(()),
+            viewWillAppear: viewWillAppearRelay.asObservable(),
             itemSelected: settingView.tableView.rx.itemSelected.asObservable()
         )
            
@@ -42,8 +49,8 @@ final class SettingViewController: BaseViewController {
             .drive(settingView.tableView.rx.items(cellIdentifier: SettingCell.identifier, cellType: SettingCell.self)) { (row, element, cell) in
                 cell.label.text = element
                             if row == 0 {
-                                let nickname = UserDefaultsManager.shared.selectedTamagochi()?.name
-                                cell.nicknameLabel.text = nickname
+                                let name = UserDefaultsManager.shared.userName
+                                cell.nicknameLabel.text = name
                             } else {
                                 cell.nicknameLabel.text = ""
                             }
