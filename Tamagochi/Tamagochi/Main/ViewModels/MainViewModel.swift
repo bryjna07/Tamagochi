@@ -16,7 +16,6 @@ final class MainViewModel {
     let manager = UserDefaultsManager.shared
     
     struct Input {
-        let viewDidLoad: Observable<Void>
         let viewWillAppear: Observable<Void>
         let riceButtonTap: Observable<String>
         let waterButtonTap: Observable<String>
@@ -35,15 +34,8 @@ final class MainViewModel {
     func transform(input: Input) -> Output {
         
         let title = PublishRelay<String>()
-        let tamagochiRelay = BehaviorRelay<TamagochiData?>(value: nil)
+        let tamagochiRelay = BehaviorRelay(value: tamagochi)
         let textError = PublishRelay<TamagochiError>()
-        
-        // 선택된 다마고치 꺼내오기
-        input.viewDidLoad
-            .subscribe(with: self) { owner, _ in
-                tamagochiRelay.accept(owner.tamagochi)
-            }
-            .disposed(by: disposeBag)
         
         input.viewWillAppear
             .asDriver(onErrorDriveWith: .empty())
@@ -87,7 +79,7 @@ final class MainViewModel {
             .disposed(by: disposeBag)
         
         return Output(navTitle: title.asDriver(onErrorDriveWith: .empty()),
-                      tamagochi: tamagochiRelay.compactMap { $0 }.asDriver(onErrorDriveWith: .empty()),
+                      tamagochi: tamagochiRelay.asDriver(onErrorDriveWith: .empty()),
                       showAlert: textError.asDriver(onErrorDriveWith: .empty())
         )
     }

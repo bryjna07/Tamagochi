@@ -32,7 +32,6 @@ final class StartDetailViewController: BaseViewController {
     private func bind() {
         
         let input = StartDetailViewModel.Input(
-            viewDidLoad: Observable.just(()),
             startButtonTap: detailView.startButton.rx.tap.asObservable()
         )
         

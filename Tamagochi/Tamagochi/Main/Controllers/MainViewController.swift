@@ -47,7 +47,6 @@ final class MainViewController: BaseViewController {
     private func bind() {
         
         let input = MainViewModel.Input(
-            viewDidLoad: Observable.just(()),
             viewWillAppear: viewWillAppearRelay.asObservable(),
             riceButtonTap: mainView.riceFeedingView.button.rx.tap
                 .withLatestFrom(mainView.riceFeedingView.textField.rx.text.orEmpty),

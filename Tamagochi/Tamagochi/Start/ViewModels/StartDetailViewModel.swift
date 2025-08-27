@@ -16,7 +16,6 @@ final class StartDetailViewModel {
     
     
     struct Input {
-        let viewDidLoad: Observable<Void>
         let startButtonTap: Observable<Void>
     }
     
@@ -31,16 +30,9 @@ final class StartDetailViewModel {
     
     func transform(input: Input) -> Output {
         
-        /// publishRelay가 안되는 이유 생각해보기
-        let tamagochiRelay = BehaviorRelay<Tamagochi?>(value: nil)
+        let tamagochi = Observable.just(tamagochi)
         
         let startRelay = PublishRelay<TamagochiData>()
-        
-        input.viewDidLoad
-            .bind(with: self) { owner, _ in
-                tamagochiRelay.accept(owner.tamagochi)
-            }
-            .disposed(by: disposeBag)
         
         input.startButtonTap
             .bind(with: self) { owner, _ in
@@ -65,7 +57,7 @@ final class StartDetailViewModel {
             .disposed(by: disposeBag)
         
         return Output(
-            tamagochi: tamagochiRelay.compactMap { $0 } .asDriver(onErrorDriveWith: .empty()),
+            tamagochi: tamagochi.asDriver(onErrorDriveWith: .empty()),
             startButtonTap: startRelay.asDriver(onErrorDriveWith: .empty())
         )
     }
