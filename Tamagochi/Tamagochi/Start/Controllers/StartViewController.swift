@@ -9,11 +9,22 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+enum SelectType: String {
+    case start = "선택"
+    case change = "변경"
+}
+
 final class StartViewController: BaseViewController {
     
     private let startView = StartView()
     private let disposeBag = DisposeBag()
     private let viewModel = StartViewModel()
+    private let type: SelectType
+    
+    init(type: SelectType) {
+        self.type = type
+        super.init(nibName: nil, bundle: nil)
+    }
     
     override func loadView() {
         view = startView
@@ -27,7 +38,7 @@ final class StartViewController: BaseViewController {
 
     override func setupNaviBar() {
         super.setupNaviBar()
-        navigationItem.title = "다마고치 선택하기"
+        navigationItem.title = "다마고치 \(type.rawValue)하기"
     }
 
     private func bind() {

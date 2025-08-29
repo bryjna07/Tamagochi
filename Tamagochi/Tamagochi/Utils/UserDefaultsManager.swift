@@ -21,6 +21,7 @@ final class UserDefaultsManager {
     @UserDefault(key: "userName", defaultValue: "대장")
     var userName: String
     
+    // 제네릭 프로토콜 -> 타입메서드? , 추상화 해보기 어떤 타입에서는 사용할 수 있도록
     func selectedTamagochi() -> TamagochiData? {
         return tamagochiData.first { $0.isSelected }
     }

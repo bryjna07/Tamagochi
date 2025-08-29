@@ -41,7 +41,7 @@ final class MainViewController: BaseViewController {
     override func setupNaviBar() {
         super.setupNaviBar()
         navigationItem.rightBarButtonItem = profileButton
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "다마고치", style: .plain, target: nil, action: nil)
     }
     
     private func bind() {

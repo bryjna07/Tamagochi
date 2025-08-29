@@ -20,7 +20,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             let tab = TabBarController(data: data)
             window?.rootViewController = tab
         } else {
-            let startVC = StartViewController()
+            let startVC = StartViewController(type: .start)
             let nav = UINavigationController(rootViewController: startVC)
             window?.rootViewController = nav
         }

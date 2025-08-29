@@ -13,6 +13,7 @@ struct Tamagochi {
     let text: String
     let isAvailable: Bool
     
+    /// 계산속성 vs 저장속성
     static var tamagochis: [Tamagochi] {
         let basicTamagochis = [
             Tamagochi(name: "따끔따끔 다마고치", imageName: "1-1", text: "저는 따끔따끔 다마고치 입니당 따끔따끔", isAvailable: true),

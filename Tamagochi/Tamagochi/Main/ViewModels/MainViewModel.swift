@@ -46,35 +46,43 @@ final class MainViewModel {
         
         // 밥 먹기
         input.riceButtonTap
-            .subscribe(with: self) { owner, text in
-                let num: Int
-                do {
-                    let result = try owner.textValidation(text: text, type: .rice)
-                    num = result
+            .map { $0.isEmpty ? "1" : $0 }
+            .map { text -> Result<Int, TamagochiError> in
+                do throws(TamagochiError) {
+                    return .success(try self.textValidate(text: text, type: .rice))
                 } catch {
-                    let error = error as! TamagochiError
-                    num = 0
+                    return .failure(error)
+                }
+            }
+            .subscribe(with: self) { owner, result in
+                switch result {
+                case .success(let num):
+                    owner.updateTamagochi(num: num, type: .rice)
+                    tamagochiRelay.accept(owner.tamagochi)
+                case .failure(let error):
                     textError.accept(error)
                 }
-                owner.updateTamagochi(num: num, type: .rice)
-                tamagochiRelay.accept(owner.tamagochi)
             }
             .disposed(by: disposeBag)
-
+        
         // 물 먹기
         input.waterButtonTap
-            .subscribe(with: self) { owner, text in
-                let num: Int
-                do {
-                    let result = try owner.textValidation(text: text, type: .water)
-                    num = result
+            .map { $0.isEmpty ? "1" : $0 }
+            .map { text -> Result<Int, TamagochiError> in
+                do throws(TamagochiError) {
+                    return .success(try self.textValidate(text: text, type: .water))
                 } catch {
-                    let error = error as! TamagochiError
-                    num = 0
+                    return .failure(error)
+                }
+            }
+            .subscribe(with: self) { owner, result in
+                switch result {
+                case .success(let num):
+                    owner.updateTamagochi(num: num, type: .water)
+                    tamagochiRelay.accept(owner.tamagochi)
+                case .failure(let error):
                     textError.accept(error)
                 }
-                owner.updateTamagochi(num: num, type: .water)
-                tamagochiRelay.accept(owner.tamagochi)
             }
             .disposed(by: disposeBag)
         
@@ -84,10 +92,7 @@ final class MainViewModel {
         )
     }
     
-    private func textValidation(text: String, type: FeedType) throws(TamagochiError) -> Int {
-        guard !text.isEmpty else {
-            return 1
-        }
+    private func textValidate(text: String, type: FeedType) throws(TamagochiError) -> Int {
         guard let num = Int(text) else {
             throw .notInt
         }

@@ -35,7 +35,7 @@ final class LottoViewController: BaseViewController {
     }
     
     private func bind() {
-//
+
         let input = LottoViewModel.Input(
             searchTap: Observable
                 .merge(
@@ -44,19 +44,15 @@ final class LottoViewController: BaseViewController {
                 )
                 .withLatestFrom(searchField.textField.rx.text.orEmpty)
         )
-        
-//        let a =  searchField.textField.rx.controlEvent(.editingDidEndOnExit).asObservable()
-//                        .withLatestFrom(searchField.textField.rx.text.orEmpty)
-//        let b = Observable
-//            .merge(
-//                searchField.textField.rx.controlEvent(.editingDidEndOnExit).asObservable(),
-//                searchField.button.rx.tap.asObservable()
-//            )
-//            .withLatestFrom(searchField.textField.rx.text.orEmpty)
-//        let c = searchField.button.rx.tap
-//            .withLatestFrom(searchField.textField.rx.text.orEmpty)
             
         let output = viewModel.transform(input: input)
+        
+        output.showAlert
+            .drive(with: self) { owner, error in
+                owner.showAlert(title: "입력오류", message: error.errorText, ok: "확인") { }
+            }
+            .disposed(by: disposeBag)
+
         
         output.lotto
             .drive(with: self) { owner, response in

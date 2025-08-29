@@ -51,7 +51,6 @@ final class StartDetailViewModel {
                     tamagochiData.isSelected = true
                     UserDefaultsManager.shared.tamagochiData = allData
                     startRelay.accept(tamagochiData)
-                    print("탭바로 이동", tamagochiData)
                 }
             }
             .disposed(by: disposeBag)

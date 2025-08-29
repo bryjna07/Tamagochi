@@ -39,27 +39,26 @@ final class BoxOfficeViewController: BaseViewController {
         
         let output = viewModel.transform(input: input)
         
-        let list = BehaviorRelay<[Movie]>(value: [])
-        
-        output.movie
-            .drive(with: self) { owner, reponse in
-                switch reponse {
-                case .success(let value):
-                    list.accept(value.boxOffice.movieList)
-                case .failure(let error):
-                    owner.view.makeToast(error.errorText, position: .top)
-                }
+        output.showAlert
+            .drive(with: self) { owner, error in
+                owner.showAlert(title: "입력오류", message: error.errorText, ok: "확인") { }
             }
             .disposed(by: disposeBag)
-
-        list
-            .bind(to: tableView.rx.items(
+        
+        output.movie
+            .drive(tableView.rx.items(
                 cellIdentifier: PersonTableViewCell.identifier,
                 cellType: PersonTableViewCell.self)
             ) { (row, element, cell) in
                 cell.usernameLabel.text = element.movieNm
             }
             .disposed(by: disposeBag)
+        
+        output.networkError
+            .drive(with: self) { owner, error in
+                owner.view.makeToast(error.errorText, position: .top)
+            }
+        .disposed(by: disposeBag)
     }
     
     private func configure() {
